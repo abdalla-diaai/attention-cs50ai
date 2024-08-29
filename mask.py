@@ -1,6 +1,6 @@
 import sys
 import tensorflow as tf
-
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from transformers import AutoTokenizer, TFBertForMaskedLM
 
@@ -20,7 +20,7 @@ def main():
     text = input("Text: ")
 
     # Tokenize input
-    tokenizer = AutoTokenizer.from_pretrained(MODEL)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL, clean_up_tokenization_spaces=True)
     inputs = tokenizer(text, return_tensors="tf")
     mask_token_index = get_mask_token_index(tokenizer.mask_token_id, inputs)
     if mask_token_index is None:
@@ -45,9 +45,13 @@ def get_mask_token_index(mask_token_id, inputs):
     Return the index of the token with the specified `mask_token_id`, or
     `None` if not present in the `inputs`.
     """
-    # TODO: Implement this function    
+    # Convert inputs["input_ids"] to a NumPy array and get the first element if it's batched
+    input_ids = inputs["input_ids"].numpy().flatten()
+    # Find the indices where the token ID matches the mask_token_id
+    mask_indices = np.where(input_ids == mask_token_id)[0]
+    if len(mask_indices) > 0:
+        return mask_indices[0]  # Return the index of the first occurrence of mask_token_id
     return None
-
 
 def get_color_for_attention_score(attention_score):
     """
@@ -55,15 +59,15 @@ def get_color_for_attention_score(attention_score):
     given `attention_score`. Each value should be in the range [0, 255].
     """
     # TODO: Implement this function
-    if attention_score == 0:
-        return (0, 0, 0)
-    elif attention_score == 1:
-        return (255, 255, 255)
-    else:
-        colour = round(attention_score * 255)
-        return (colour, colour, colour)
+    # if attention_score == 0:
+    #     return (0, 0, 0)
+    # elif attention_score == 1:
+    #     return (255, 255, 255)
+    # else:
+    #     colour = round(attention_score * 255)
+    #     return (colour, colour, colour)
 
-
+    pass
 
 def visualize_attentions(tokens, attentions):
     """
@@ -76,12 +80,13 @@ def visualize_attentions(tokens, attentions):
     (starting count from 1).
     """
     # TODO: Update this function to produce diagrams for all layers and heads.
-    generate_diagram(
-        1,
-        1,
-        tokens,
-        attentions[0][0][0]
-    )
+    # generate_diagram(
+    #     1,
+    #     1,
+    #     tokens,
+    #     attentions[0][0][0]
+    # )
+    pass
 
 
 def generate_diagram(layer_number, head_number, tokens, attention_weights):

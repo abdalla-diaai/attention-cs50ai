@@ -19,7 +19,7 @@ PIXELS_PER_WORD = 200
 def main():
     text = input("Text: ")
 
-    # Tokenize input
+    # Tokenize input, set clean up tokenization spaces to True
     tokenizer = AutoTokenizer.from_pretrained(MODEL, clean_up_tokenization_spaces=True)
     inputs = tokenizer(text, return_tensors="tf")
     mask_token_index = get_mask_token_index(tokenizer.mask_token_id, inputs)
@@ -59,15 +59,15 @@ def get_color_for_attention_score(attention_score):
     given `attention_score`. Each value should be in the range [0, 255].
     """
     # TODO: Implement this function
-    # if attention_score == 0:
-    #     return (0, 0, 0)
-    # elif attention_score == 1:
-    #     return (255, 255, 255)
-    # else:
-    #     colour = round(attention_score * 255)
-    #     return (colour, colour, colour)
-
-    pass
+    if attention_score >= 0 and attention_score <= 1:
+        if attention_score == 0:
+            return (0, 0, 0)
+        elif attention_score == 1:
+            return (255, 255, 255)
+        else:
+            colour = round(float(attention_score) * 255)
+            if colour <= 225:
+                return (colour, colour, colour)
 
 def visualize_attentions(tokens, attentions):
     """
@@ -80,14 +80,16 @@ def visualize_attentions(tokens, attentions):
     (starting count from 1).
     """
     # TODO: Update this function to produce diagrams for all layers and heads.
-    # generate_diagram(
-    #     1,
-    #     1,
-    #     tokens,
-    #     attentions[0][0][0]
-    # )
-    pass
 
+    for j in range(0, len(attentions)):
+        for l in range(0, len(attentions)):
+            generate_diagram(
+                j + 1,
+                l + 1,
+                tokens,
+                attentions[j][0][l]
+            )
+ 
 
 def generate_diagram(layer_number, head_number, tokens, attention_weights):
     """
@@ -136,7 +138,7 @@ def generate_diagram(layer_number, head_number, tokens, attention_weights):
             draw.rectangle((x, y, x + GRID_SIZE, y + GRID_SIZE), fill=color)
 
     # Save image
-    img.save(f"Attention_Layer{layer_number}_Head{head_number}.png")
+    img.save(f"images/Attention_Layer{layer_number}_Head{head_number}.png")
 
 
 if __name__ == "__main__":

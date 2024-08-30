@@ -50,24 +50,25 @@ def get_mask_token_index(mask_token_id, inputs):
     # Find the indices where the token ID matches the mask_token_id
     mask_indices = np.where(input_ids == mask_token_id)[0]
     if len(mask_indices) > 0:
-        return mask_indices[0]  # Return the index of the first occurrence of mask_token_id
+        return mask_indices[
+            0
+        ]  # Return the index of the first occurrence of mask_token_id
     return None
+
 
 def get_color_for_attention_score(attention_score):
     """
     Return a tuple of three integers representing a shade of gray for the
     given `attention_score`. Each value should be in the range [0, 255].
     """
-    # TODO: Implement this function
-    if attention_score >= 0 and attention_score <= 1:
-        if attention_score == 0:
-            return (0, 0, 0)
-        elif attention_score == 1:
-            return (255, 255, 255)
-        else:
-            colour = round(float(attention_score) * 255)
-            if colour <= 225:
-                return (colour, colour, colour)
+    if float(attention_score) == 0:
+        return (0, 0, 0)
+    elif float(attention_score) == 1:
+        return (255, 255, 255)
+    else:
+        colour = round(float(attention_score) * 255)
+        return (colour, colour, colour)
+
 
 def visualize_attentions(tokens, attentions):
     """
@@ -79,17 +80,10 @@ def visualize_attentions(tokens, attentions):
     include both the layer number (starting count from 1) and head number
     (starting count from 1).
     """
-    # TODO: Update this function to produce diagrams for all layers and heads.
-
     for j in range(0, len(attentions)):
         for l in range(0, len(attentions)):
-            generate_diagram(
-                j + 1,
-                l + 1,
-                tokens,
-                attentions[j][0][l]
-            )
- 
+            generate_diagram(j + 1, l + 1, tokens, attentions[j][0][l])
+
 
 def generate_diagram(layer_number, head_number, tokens, attention_weights):
     """
@@ -103,7 +97,7 @@ def generate_diagram(layer_number, head_number, tokens, attention_weights):
     """
     # Create new image
     image_size = GRID_SIZE * len(tokens) + PIXELS_PER_WORD
-    img = Image.new("RGBA", (image_size, image_size), "black")
+    img = Image.new("RGB", (image_size, image_size), "black")
     draw = ImageDraw.Draw(img)
 
     # Draw each token onto the image
@@ -115,7 +109,7 @@ def generate_diagram(layer_number, head_number, tokens, attention_weights):
             (image_size - PIXELS_PER_WORD, PIXELS_PER_WORD + i * GRID_SIZE),
             token,
             fill="white",
-            font=FONT
+            font=FONT,
         )
         token_image = token_image.rotate(90)
         img.paste(token_image, mask=token_image)
@@ -126,7 +120,7 @@ def generate_diagram(layer_number, head_number, tokens, attention_weights):
             (PIXELS_PER_WORD - width, PIXELS_PER_WORD + i * GRID_SIZE),
             token,
             fill="white",
-            font=FONT
+            font=FONT,
         )
 
     # Draw each word
